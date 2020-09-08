@@ -6,63 +6,67 @@ description: "本教程用于安装高可用性集群"
 Weight: 2230
 ---
 
-由于对于生产环境，我们需要考虑集群的高可用性。教你部署如何在阿里 ECS 实例服务快速部署一套高可用的生产环境
-Kubernetes 服务需要做到高可用，需要保证 kube-apiserver 的 HA ，推荐下列两种方式
- 1. 阿里云 SLB 
- 2. keepalived + haproxy [keepalived + haproxy](https://kubesphere.com.cn/forum/d/1566-kubernetes-keepalived-haproxy)对 kube-apiserver 进行负载均衡，实现高可用 kubernetes 集群。
+对于生产环境，我们需要考虑集群的高可用性。本文教你部署如何在多台阿里 ECS 实例快速部署一套高可用的生产环境。要满足 Kubernetes 集群服务需要做到高可用，需要保证 kube-apiserver 的 HA ，可使用以下下列两种方式：
 
- ## 前提条件
+- 阿里云 SLB （推荐）
+- keepalived + haproxy [keepalived + haproxy](https://kubesphere.com.cn/forum/d/1566-kubernetes-keepalived-haproxy)对 kube-apiserver 进行负载均衡，实现高可用 kubernetes 集群。
 
- - 请遵循该[指南](https://github.com/kubesphere/kubekey)，确保您已经知道如何将 KubeSphere 与多节点集群一起安装。有关用于安装的 config.yaml 文件的详细信息。本教程重点介绍配置阿里负载均衡器服务高可用安装。
- - 考虑到数据的持久性，对于生产环境，我们不建议您使用存储OpenEBS，建议 NFS ， GlusterFS 等存储(需要提前安装)。文章为了进行开发和测试，集成的 OpenEBS 直接将 LocalPV 设置为存储服务。
- - SSH 可以访问所有节点。
- - 所有节点的时间同步。
- - Red Hat 在其 Linux 发行版本中包括了SELinux，建议关闭 SELinux 或者将 SELinux 的模式切换为 Permissive [宽容]工作模式。
+## 前提条件
 
- ## 部署架构
- 
- ![部署架构](/images/docs/ali-ecs/ali.png)
- 
- ## 创建主机
+- 考虑到数据的持久性，对于生产环境，我们建议您准备持久化存储。若搭建开发和测试，您可以直接使用默认集成的 OpenEBS 准备 LocalPV；
+- SSH 可以访问所有节点；
+- 所有节点的时间同步；
+- Red Hat 在其 Linux 发行版本中包括了 SELinux，建议关闭 SELinux 或者将 SELinux 的模式切换为 Permissive [宽容]工作模式。
 
- 本示例创建 SLB + 6 台 **CentOS Linux release 7.6.1810 (Core)** 的虚拟机，每台配置为 2Core4GB40G
+## 部署架构
 
- | 主机IP | 主机名称 | 角色 |
- | --- | --- | --- |
- |39.104.82.170|Eip|slb|
- |172.24.107.72|master1|master1, etcd|
- |172.24.107.73|master2|master2, etcd| 
- |172.24.107.74|master3|master3, etcd| 
- |172.24.107.75|node1|node|
- |172.24.107.76|node2|node|
- |172.24.107.77|node3|node|
- 
- > 注意:机器有限，所以把 etcd 放入 master，在生产环境建议单独部署 etcd，提高稳定性
+![部署架构](/images/docs/ali-ecs/ali.png)
 
- ## 使用阿里 SLB 部署
- ###  创建 SLB
- 
- 进入到阿里云控制， 在左侧列表选择'负载均衡'， 选择'实例管理' 进入下图， 选择'创建负载均衡'
- 
- ![1-1-创建slb](/images/docs/ali-ecs/ali-slb-create.png)
- 
- ###  配置 SLB
- 
- 配置规格根据自身流量规模创建
- 
- ![2-1-创建slb](/images/docs/ali-ecs/ali-slb-config.png)
- 
-后面的 config.yaml 需要配置 slb 分配的地址
- ```yaml
-     controlPlaneEndpoint:
-         domain: lb.kubesphere.local
-         address: "39.104.82.170"
-         port: "6443"
+## 创建主机
+
+本示例创建 SLB + 6 台 **CentOS Linux release 7.6.1810 (Core)** 的虚拟机，每台配置为 **2 Core 4 GB 40 G**，仅用于最小化安装，若资源充足建议使用每台配置 **4 Core 8 GB 100 G** 以上的虚拟机。
+
+| 主机IP | 主机名称 | 角色 |
+| --- | --- | --- |
+|39.104.82.170|Eip|slb|
+|172.24.107.72|master1|master1, etcd|
+|172.24.107.73|master2|master2, etcd|
+|172.24.107.74|master3|master3, etcd|
+|172.24.107.75|node1|node|
+|172.24.107.76|node2|node|
+|172.24.107.77|node3|node|
+
+> 注意: 由于演示机器有限，所以把 etcd 跟 master 放在同样 3 台机器，在生产环境建议单独部署至少 3 台 etcd，提高稳定性。
+
+## 使用阿里 SLB 部署
+
+以下创建一个 SLB，设置监听集群的 6443 端口。
+
+###  创建 SLB
+
+进入到阿里云控制， 在左侧列表选择'负载均衡'， 选择'实例管理' 进入下图， 选择'创建负载均衡'
+
+![1-1-创建slb](/images/docs/ali-ecs/ali-slb-create.png)
+
+###  配置 SLB
+
+配置规格根据自身流量规模创建
+
+![2-1-创建slb](/images/docs/ali-ecs/ali-slb-config.png)
+
+注意在后面的 config.yaml 需要配置 slb 分配的地址
+
+```yaml
+controlPlaneEndpoint:
+   domain: lb.kubesphere.local
+   address: "39.104.82.170"
+   port: "6443"
 ```
- ###  配置SLB 主机实例
- 
- 需要在服务器组添加需要负载的3台 master 主机后按下图顺序配置监听 TCP 6443 端口( api-server ) 
- 
+
+###  配置SLB 主机实例
+
+需要在服务器组添加需要负载的3台 master 主机后按下图顺序配置监听 TCP 6443 端口 (api-server)
+
 ![3-1-添加主机](/images/docs/ali-ecs/ali-slb-add.png)
 
 ![3-2-配置监听端口](/images/docs/ali-ecs/ali-slb-listen-conf1.png)
@@ -71,166 +75,127 @@ Kubernetes 服务需要做到高可用，需要保证 kube-apiserver 的 HA ，�
 
 ![3-4-配置监听端口](/images/docs/ali-ecs/ali-slb-listen-conf3.png)
 
-再按上述操作配置监听 HTTP 30880 端口( ks-console )，主机添加选择全部主机节点。
-
-![3-5-配置监听端口](/images/docs/ali-ecs/ali-slb-listen-conf4.png)
-
-- <font color=red>现在的健康检查暂时是失败的，因为还没部署 master 的服务，所以端口 telnet 不通的。</font>
-- 然后提交审核即可
-
- ###  获取安装程序可执行文件
- 
- ```bash
- #下载 kk installer 至任意一台机器
- curl -O -k https://kubernetes.pek3b.qingstor.com/tools/kubekey/kk
- chmod +x kk
- ```
-
-{{< notice tip >}} 
-
- 您可以使用高级安装来控制自定义参数或创建多节点群集。具体来说，通过指定配置文件来创建集群。
- 
+{{< notice note >}}
+- 现在的健康检查暂时是失败的，因为还没部署 master 的服务，所以端口 telnet 不通的。
+- 完成上述操作后，提交审核即可
 {{</ notice >}}
 
- ###  使用 kubekey 部署k8s集群和 KubeSphere 控制台
+###  获取 Installer
 
- ```bash
- # 在当前位置创建配置文件 config-sample.yaml |包含 KubeSphere 的配置文件
- ./kk create config --with-kubesphere v3.0.0 -f config-sample.yaml
---- 
-# 同时安装存储插件 (支持：localVolume、nfsClient、rbd、glusterfs)。您可以指定多个插件并用逗号分隔。请注意，您添加的第一个将是默认存储类。
-./kk create config --with-storage localVolume --with-kubesphere v3.0.0 -f config-sample.yaml
- ```
- ###  集群配置调整
- 
- ```yaml
- #vi ~/config-sample.yaml
- apiVersion: kubekey.kubesphere.io/v1alpha1
- kind: Cluster
- metadata:
-   name: config-sample
- spec:
-   hosts:
-   - {name: master1, address: 172.24.107.72, internalAddress: 172.24.107.72, user: root, password: QWEqwe123}
-   - {name: master2, address: 172.24.107.73, internalAddress: 172.24.107.73, user: root, password: QWEqwe123}
-   - {name: master3, address: 172.24.107.74, internalAddress: 172.24.107.74, user: root, password: QWEqwe123}
-   - {name: node1, address: 172.24.107.75, internalAddress: 172.24.107.75, user: root, password: QWEqwe123}
-   - {name: node2, address: 172.24.107.76, internalAddress: 172.24.107.76, user: root, password: QWEqwe123}
-   - {name: node3, address: 172.24.107.77, internalAddress: 172.24.107.77, user: root, password: QWEqwe123}
- 
-   roleGroups:
-     etcd:
-     - master1
-     - master2
-     - master3
-     master: 
-     - master1
-     - master2
-     - master3
-     worker:
-     - node1
-     - node2
-     - node3
-   controlPlaneEndpoint:
-     domain: lb.kubesphere.local
-     address: "39.104.82.170"
-     port: "6443"
-   kubernetes:
-     version: v1.17.9
-     imageRepo: kubesphere
-     clusterName: cluster.local
-   network:
-     plugin: calico
-     kubePodsCIDR: 10.233.64.0/18
-     kubeServiceCIDR: 10.233.0.0/18
-   registry:
-     registryMirrors: ["https://*.mirror.aliyuncs.com"] # # input your registryMirrors
-     insecureRegistries: []
-   storage:
-     defaultStorageClass: localVolume
-     localVolume:
-       storageClassName: local
- 
- ---
- apiVersion: installer.kubesphere.io/v1alpha1
- kind: ClusterConfiguration
- metadata:
-   name: ks-installer
-   namespace: kubesphere-system
-   labels:
-     version: v3.0.0
- spec:
-   local_registry: ""
-   persistence:
-     storageClass: ""
-   authentication:
-     jwtSecret: ""
-   etcd:
-     monitoring: true
-     endpointIps: 172.24.107.72,172.24.107.73,172.24.107.74
-     port: 2379
-     tlsEnable: true
-   common:
-     es:
-       elasticsearchDataVolumeSize: 20Gi
-       elasticsearchMasterVolumeSize: 4Gi
-       elkPrefix: logstash
-       logMaxAge: 7
-     mysqlVolumeSize: 20Gi
-     minioVolumeSize: 20Gi
-     etcdVolumeSize: 20Gi
-     openldapVolumeSize: 2Gi
-     redisVolumSize: 2Gi
-   console:
-     enableMultiLogin: false  # enable/disable multi login
-     port: 30880
-   alerting:
-     enabled: false
-   auditing:
-     enabled: false
-   devops:
-     enabled: false
-     jenkinsMemoryLim: 2Gi
-     jenkinsMemoryReq: 1500Mi
-     jenkinsVolumeSize: 8Gi
-     jenkinsJavaOpts_Xms: 512m
-     jenkinsJavaOpts_Xmx: 512m
-     jenkinsJavaOpts_MaxRAM: 2g
-   events:
-     enabled: false
-     ruler:
-       enabled: true
-       replicas: 2
-   logging:
-     enabled: false
-     logsidecarReplicas: 2
-   metrics_server:
-     enabled: true
-   monitoring:
-     prometheusMemoryRequest: 400Mi
-     prometheusVolumeSize: 20Gi
-   multicluster:
-     clusterRole: none  # host | member | none
-   networkpolicy:
-     enabled: false
-   notification:
-     enabled: false
-   openpitrix:
-     enabled: false
-   servicemesh:
-     enabled: false
- ```
+下载可执行安装程序 `kk` 至一台目标机器：
 
- ###  执行命令创建集群
- ```bash
- # 指定配置文件创建集群
+```
+wget -c https://kubesphere.io/download/kubekey-v1.0.0-linux-amd64.tar.gz -O - | tar -xz
+```
+
+给 `kk` 授予可执行权限：
+
+```bash
+chmod +x kk
+```
+
+{{< notice tip >}}
+您可以使用高级安装来控制自定义参数或创建多节点群集。具体来说，通过指定配置文件来创建集群。
+{{</ notice >}}
+
+###  使用 KubeKey 部署集群
+
+在当前位置创建配置文件 `config-sample.yaml`：
+
+```bash
+./kk create config --with-kubesphere v3.0.0 --with-kubernetes v1.17.9 -f config-sample.yaml
+```
+
+> 提示：默认是 Kubernetes 1.17.9，这些 Kubernetes 版本也与 KubeSphere 同时进行过充分的测试： v1.15.12, v1.16.13, v1.17.9 (default), v1.18.6，您可以根据需要指定版本。
+
+###  集群配置调整
+
+修改配置文件 `config-sample.yaml`：
+
+```
+vi config-sample.yaml
+```
+
+参考以下 `config-sample.yaml` 的主机节点配置，替换为您
+
+```yaml
+#vi ~/config-sample.yaml
+apiVersion: kubekey.kubesphere.io/v1alpha1
+kind: Cluster
+metadata:
+  name: config-sample
+  spec:
+    hosts:
+    - {name: master1, address: 172.24.107.72, internalAddress: 172.24.107.72, user: root, password: QWEqwe123}
+    - {name: master2, address: 172.24.107.73, internalAddress: 172.24.107.73, user: root, password: QWEqwe123}
+    - {name: master3, address: 172.24.107.74, internalAddress: 172.24.107.74, user: root, password: QWEqwe123}
+    - {name: node1, address: 172.24.107.75, internalAddress: 172.24.107.75, user: root, password: QWEqwe123}
+    - {name: node2, address: 172.24.107.76, internalAddress: 172.24.107.76, user: root, password: QWEqwe123}
+    - {name: node3, address: 172.24.107.77, internalAddress: 172.24.107.77, user: root, password: QWEqwe123}
+    roleGroups:
+      etcd:
+      - master1
+      - master2
+      - master3
+      master:
+      - master1
+      - master2
+      - master3
+      worker:
+      - node1
+      - node2
+      - node3
+    controlPlaneEndpoint:
+      domain: lb.kubesphere.local
+      address: "39.104.82.170"
+      port: "6443"
+    kubernetes:
+      version: v1.17.9
+      imageRepo: kubesphere
+      clusterName: cluster.local
+      masqueradeAll: false  # masqueradeAll tells kube-proxy to SNAT everything if using the pure iptables proxy mode. [Default: false]
+      maxPods: 110  # maxPods is the number of pods that can run on this Kubelet. [Default: 110]
+      nodeCidrMaskSize: 24  # internal network node size allocation. This is the size allocated to each node on your network. [Default: 24]
+      proxyMode: ipvs  # mode specifies which proxy mode to use. [Default: ipvs]
+    network:
+      plugin: calico
+      calico:
+        ipipMode: Always  # IPIP Mode to use for the IPv4 POOL created at start up. If set to a value other than Never, vxlanMode should be set to "Never". [Always | CrossSubnet | Never] [Default: Always]
+        vxlanMode: Never  # VXLAN Mode to use for the IPv4 POOL created at start up. If set to a value other than Never, ipipMode should be set to "Never". [Always | CrossSubnet | Never] [Default: Never]
+        vethMTU: 1440  # The maximum transmission unit (MTU) setting determines the largest packet size that can be transmitted through your network. [Default: 1440]
+      kubePodsCIDR: 10.233.64.0/18
+      kubeServiceCIDR: 10.233.0.0/18
+    registry:
+      registryMirrors: []
+      insecureRegistries: []
+    addons: [] # add your persistent storage and LoadBalancer plugin configuration here if you have, see https://kubesphere.io/docs/installing-on-linux/introduction/storage-configuration/
+
+···
+# 其它配置可以在安装后之后根据需要进行修改
+```
+
+#### 持久化存储配置
+
+如本文开头的前提条件所说，对于生产环境，我们建议您准备持久性存储，可参考以下说明进行配置。若搭建开发和测试，您可以直接使用默认集成的 OpenEBS 准备 LocalPV，则可以跳过这小节。
+
+{{< notice note >}}
+- 继续编辑上述 `config-sample.yaml` 文件，找到 `[addons]` 字段，这里支持定义任何持久化存储的插件或客户端，如 CSI (
+alibaba-cloud-csi-driver)、NFS Client、Ceph、GlusterFS，您可以根据您自己的持久化存储服务类型，并参考 [持久化存储服务](https://kubesphere.com.cn/docs/installing-on-linux/introduction/storage-configuration/) 中对应的示例 yaml 文件进行设置。
+- 只需要将 CSI 存储插件安装时需要 apply 的所有 yaml 文件在 `[addons]` 中列出即可，注意预先参考 [Alibaba Cloud Kubernetes CSI Plugin](https://github.com/kubernetes-sigs/alibaba-cloud-csi-driver#alibaba-cloud-kubernetes-csi-plugin)，选择您需要的存储类型的 CSI 插件，如 Cloud Disk CSI Plugin、NAS CSI Plugin、NAS CSI Plugin、OSS CSI Plugin，然后在 CSI 的相关 yaml 中配置对接阿里云的相关信息。
+{{</ notice >}}
+
+###  执行命令创建集群
+
+完成上述配置后，通过配置文件创建集群。
+
+```bash
 ./kk create cluster -f config-sample.yaml
 
- # 查看 KubeSphere 安装日志  -- 直到出现控制台的访问地址和登陆账号
+# 查看 KubeSphere 安装日志  -- 直到出现控制台的访问地址和登陆账号
 kubectl logs -n kubesphere-system $(kubectl get pod -n kubesphere-system -l app=ks-install -o jsonpath='{.items[0].metadata.name}') -f
 ```
 
-```bash
+```
 **************************************************
 #####################################################
 ###              Welcome to KubeSphere!           ###
@@ -241,36 +206,36 @@ Account: admin
 Password: P@88w0rd
 
 NOTES：
-  1. After logging into the console, please check the
-     monitoring status of service components in
-     the "Cluster Management". If any service is not
-     ready, please wait patiently until all components 
-     are ready.
-  2. Please modify the default password after login.
+1. After logging into the console, please check the
+monitoring status of service components in
+the "Cluster Management". If any service is not
+ready, please wait patiently until all components
+are ready.
+2. Please modify the default password after login.
 
 #####################################################
 https://kubesphere.io             2020-08-24 23:30:06
 #####################################################
 ```
- 
- - 访问公网 IP + Port 为部署后的使用情况，使用默认账号密码 (`admin/P@88w0rd`)，文章安装为最小化，登陆点击`工作台` 可看到下图安装组件列表和机器情况。
 
- ![面板图](/images/docs/ali-ecs/succes.png)
+- 访问公网 IP + Port 为部署后的使用情况，使用默认账号密码 (`admin/P@88w0rd`)，文章安装为最小化，登陆点击`工作台` 可看到下图安装组件列表和机器情况。
+
+![面板图](/images/docs/ali-ecs/succes.png)
 
 ## 如何自定义开启可插拔组件
 
- + 点击 `集群管理` - `自定义资源CRD` ，在过滤条件框输入 `ClusterConfiguration` ，如图下 
+- 点击 `集群管理` - `自定义资源CRD` ，在过滤条件框输入 `ClusterConfiguration` ，如图：
 
- ![修改KsInstaller](/images/docs/ali-ecs/update_crd.png)
- 
- + 点击 `ClusterConfiguration` 详情，对 `ks-installer` 编辑保存退出即可，组件描述介绍:[文档说明](https://github.com/kubesphere/ks-installer/blob/master/deploy/cluster-configuration.yaml)
- 
- ![修改KsInstaller](/images/docs/ali-ecs/ks-install-source.png)
+![修改KsInstaller](/images/docs/ali-ecs/update_crd.png)
 
-## 安装问题
+- 点击 `ClusterConfiguration` 详情，对 `ks-installer` 编辑保存退出即可，组件描述介绍:[文档说明](https://github.com/kubesphere/ks-installer/blob/master/deploy/cluster-configuration.yaml)
+
+![修改KsInstaller](/images/docs/ali-ecs/ks-install-source.png)
+
+## FAQ
 
 > 提示: 如果安装过程中碰到 `Failed to add worker to cluster: Failed to exec command...`
 > <br>
 ``` bash 处理方式
-    kubeadm reset
+kubeadm reset
 ```

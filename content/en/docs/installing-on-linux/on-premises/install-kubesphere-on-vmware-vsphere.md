@@ -1,5 +1,5 @@
 ---
-title: "VMware vSphere Installation"
+title: "Deploy KubeSphere on VMware vSphere"
 keywords: 'kubernetes, kubesphere, VMware vSphere, installation'
 description: 'How to install KubeSphere on VMware vSphere Linux machines'
 
@@ -7,7 +7,7 @@ description: 'How to install KubeSphere on VMware vSphere Linux machines'
 weight: 2260
 ---
 
-# Introduction
+## Introduction
 
 For a production environment, we need to consider the high availability of the cluster. If the key components (e.g. kube-apiserver, kube-scheduler, and kube-controller-manager) are all running on the same master node, Kubernetes and KubeSphere will be unavailable once the master node goes down. Therefore, we need to set up a high-availability cluster by provisioning load balancers with multiple master nodes. You can use any cloud load balancer, or any hardware load balancer (e.g. F5). In addition, Keepalived and [HAproxy](https://www.haproxy.com/), or Nginx is also an alternative for creating high-availability clusters.
 
@@ -80,7 +80,10 @@ In the Ready to complete page, you review the configuration selections that you 
 ![kubesphereOnVsphere-en-0-1-8](/images/docs/vsphere/kubesphereOnVsphere-en-0-1-8.png)
 
 
-## Keepalived+Haproxy
+## Install a Load Balancer using Keepalived and Haproxy (Optional)
+
+For production environment, you have to prepare an external Load Balancer. If you do not have a Load Balancer, you can install it using Keepalived and Haproxy. If you are provisioning a development or testing environment, please skip this section.
+
 ###  Yum Install
 
 host lb-0(10.10.71.77) and host lb-1(10.10.71.66)
@@ -159,7 +162,7 @@ global_defs {
   notification_email {
   }
   smtp_connect_timeout 30   
-  router_id LVS_DEVEL01 
+  router_id LVS_DEVEL01
   vrrp_skip_check_adv_addr
   vrrp_garp_interval 0
   vrrp_gna_interval 0
@@ -173,10 +176,10 @@ vrrp_instance haproxy-vip {
   state MASTER  
   priority 100  
   interface ens192                       
-  virtual_router_id 60 
-  advert_int 1 
+  virtual_router_id 60
+  advert_int 1
   authentication {
-    auth_type PASS 
+    auth_type PASS
     auth_pass 1111
   }
   unicast_src_ip 10.10.71.77     
@@ -185,7 +188,7 @@ vrrp_instance haproxy-vip {
   }
   virtual_ipaddress {
     #vip
-    10.10.71.67/24 
+    10.10.71.67/24
   }
   track_script {
     chk_haproxy
@@ -198,7 +201,7 @@ remarks haproxy 66 lb-1-10.10.71.66 (/etc/keepalived/keepalived.conf)
 global_defs {
   notification_email {
   }
-  router_id LVS_DEVEL02 
+  router_id LVS_DEVEL02
   vrrp_skip_check_adv_addr
   vrrp_garp_interval 0
   vrrp_gna_interval 0
@@ -209,7 +212,7 @@ vrrp_script chk_haproxy {
   weight 2
 }
 vrrp_instance haproxy-vip {
-  state BACKUP 
+  state BACKUP
   priority 90
   interface ens192                        
   virtual_router_id 60
@@ -223,7 +226,7 @@ vrrp_instance haproxy-vip {
     10.10.71.77                        
   }
   virtual_ipaddress {
-    10.10.71.67/24 
+    10.10.71.67/24
   }
   track_script {
     chk_haproxy
@@ -243,7 +246,7 @@ systemctl start keepalived
 Use `ip a s` to view the vip binding status of each lb node
 
 ```bash
-ip a s 
+ip a s
 ```
 
 Pause VIP node haproxy：`systemctl stop haproxy`
@@ -255,7 +258,7 @@ systemctl stop haproxy
 Use `ip a s` again to check the vip binding of each lb node, and check whether vip drifts
 
 ```bash
-ip a s 
+ip a s
 ```
 
 Or use `systemctl status -l keepalived` command to view
@@ -264,31 +267,65 @@ Or use `systemctl status -l keepalived` command to view
 systemctl status -l keepalived
 ```
 
+## Download KubeKey
 
+[Kubekey](https://github.com/kubesphere/kubekey) is the next-gen installer which provides an easy, fast and flexible way to install Kubernetes and KubeSphere v3.0.0.
 
-## Get the Installer Excutable File
+Follow the step below to download KubeKey.
 
-Download Binary
+{{< tabs >}}
+
+{{< tab "For users with poor network connections to GitHub" >}}
+
+Download KubeKey using the following command:
 
 ```bash
-curl -O -k https://kubernetes.pek3b.qingstor.com/tools/kubekey/kk
+wget -c https://kubesphere.io/download/kubekey-v1.0.0-linux-amd64.tar.gz -O - | tar -xz
+```
+
+{{</ tab >}}
+
+{{< tab "For users with good network connections to GitHub" >}}
+
+Download KubeKey from [GitHub Release Page](https://github.com/kubesphere/kubekey/releases/tag/v1.0.0) or use the following command directly.
+
+```bash
+wget https://github.com/kubesphere/kubekey/releases/download/v1.0.0/kubekey-v1.0.0-linux-amd64.tar.gz -O - | tar -xz
+```
+
+{{</ tab >}}
+
+{{</ tabs >}}
+
+Grant the execution right to `kk`:
+
+```bash
 chmod +x kk
 ```
 
-## Create a Multi-Node Cluster 
+## Create a Multi-node Cluster
 
 You have more control to customize parameters or create a multi-node cluster using the advanced installation. Specifically, create a cluster by specifying a configuration file.。
 
-### With KubeKey, you can install Kubernetes and KubeSphere 
+With KubeKey, you can install Kubernetes and KubeSphere
 
 Create a Kubernetes cluster with KubeSphere installed (e.g. --with-kubesphere v3.0.0)
 
 ```bash
-./kk create config --with-kubesphere v3.0.0 -f ~/config-sample.yaml
+./kk create config --with-kubernetes v1.17.9 --with-kubesphere v3.0.0 -f ~/config-sample.yaml
 ```
-#### Modify the file config-sample.yaml according to your environment
 
-vi ~/config-sample.yaml
+> The following Kubernetes versions has been fully tested with KubeSphere:
+> - v1.15:   v1.15.12
+> - v1.16:   v1.16.13
+> - v1.17:   v1.17.9 (default)
+> - v1.18:   v1.18.6
+
+Modify the file config-sample.yaml according to your environment
+
+```bash
+vi config-sample.yaml
+```
 
 ```yaml
 apiVersion: kubekey.kubesphere.io/v1alpha1
@@ -308,7 +345,7 @@ spec:
     - master1
     - master2
     - master3
-    master: 
+    master:
     - master1
     - master2
     - master3
@@ -446,7 +483,7 @@ NOTES：
   1. After logging into the console, please check the
      monitoring status of service components in
      the "Cluster Management". If any service is not
-     ready, please wait patiently until all components 
+     ready, please wait patiently until all components
      are ready.
   2. Please modify the default password after login.
 #####################################################
@@ -461,5 +498,4 @@ You will be able to use default account and password `admin / P@88w0rd` to log i
 ![](/images/docs/vsphere/login.png)
 
 #### Enable Pluggable Components (Optional)
-The example above demonstrates the process of a default minimal installation. To enable other components in KubeSphere, see [Enable Pluggable Components for more details](https://github.com/kubesphere/ks-installer#enable-pluggable-components).
-
+The example above demonstrates the process of a default minimal installation. To enable other components in KubeSphere, see [Enable Pluggable Components](../../../pluggable-components/) for more details.

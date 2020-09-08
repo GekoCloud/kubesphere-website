@@ -11,7 +11,7 @@ For those who are new to KubeSphere and looking for a quick way to discover the 
 
 ## Prerequisites
 
-If your machine is behind a firewall, you need to open relevant ports by following the document [Ports Requirement](../port-firewall).
+If your machine is behind a firewall, you need to open relevant ports by following the document [Port Requirements](../../installing-on-linux/introduction/port-firewall/).
 
 ## Step 1: Prepare Linux Machine
 
@@ -27,11 +27,11 @@ See the requirements for hardware and operating system shown below. To get start
 | **Red Hat Enterprise Linux 7**                         | CPU: 2 Cores, Memory: 4 G, Disk Space: 40 G |
 | **SUSE Linux Enterprise Server 15/openSUSE Leap 15.2** | CPU: 2 Cores, Memory: 4 G, Disk Space: 40 G |
 
-{{< notice note >}} 
+{{< notice note >}}
 
-The system requirements above and the instructions below are for the default minimal installation without any optional components enabled. If your machine has at least 8 cores and 16G memory, it is recommended that you enable all components. For more information, see Enable Pluggable Components.
+The system requirements above and the instructions below are for the default minimal installation without any optional components enabled. If your machine has at least 8 cores and 16G memory, it is recommended that you enable all components. For more information, see [Enable Pluggable Components](../../pluggable-components/).
 
-{{</ notice >}} 
+{{</ notice >}}
 
 ### Node Requirements
 
@@ -48,54 +48,43 @@ The system requirements above and the instructions below are for the default min
 {{< notice tip >}}
 
 - It is recommended that your OS be clean (without any other software installed). Otherwise, there may be conflicts.
-- It is recommended that a container image mirror (accelerator) be prepared if you have trouble downloading images from dockerhub.io. See [Configure registry mirrors for the Docker daemon](https://docs.docker.com/registry/recipes/mirror/#configure-the-docker-daemon).
+- It is recommended that a container image mirror (accelerator) be prepared if you have trouble downloading images from dockerhub.io. See [Configure Booster for Installation](../../installing-on-linux/faq/configure-booster/).
 
 {{</ notice >}}
 
 ## Step 2: Download KubeKey
 
-As below, you can either download the binary file or build the binary package from source code.
+Follow the step below to download KubeKey.
 
 {{< tabs >}}
 
-{{< tab "Download Binary" >}}
+{{< tab "For users with poor network connections to GitHub" >}}
 
-Execute the following command:
-
-```bash
-curl -O -k https://kubernetes.pek3b.qingstor.com/tools/kubekey/kk
-```
+Download KubeKey using the following command:
 
 ```bash
-chmod +x kk
+wget -c https://kubesphere.io/download/kubekey-v1.0.0-linux-amd64.tar.gz -O - | tar -xz
 ```
 
 {{</ tab >}}
 
-{{< tab "Build Binary from Source Code" >}}
+{{< tab "For users with good network connections to GitHub" >}}
 
-Execute the following command one by one:
-
-```bash
-git clone https://github.com/kubesphere/kubekey.git
-```
+Download KubeKey from [GitHub Release Page](https://github.com/kubesphere/kubekey/releases/tag/v1.0.0) or use the following command directly.
 
 ```bash
-cd kubekey
+wget https://github.com/kubesphere/kubekey/releases/download/v1.0.0/kubekey-v1.0.0-linux-amd64.tar.gz -O - | tar -xz
 ```
-
-```bash
-./build.sh
-```
-
-Note:
-
-- Docker needs to be installed before the building.
-- If you have problems accessing `https://proxy.golang.org/`, execute `build.sh -p` instead.
 
 {{</ tab >}}
 
 {{</ tabs >}}
+
+Grant the execution right to `kk`:
+
+```bash
+chmod +x kk
+```
 
 {{< notice info >}}
 
@@ -111,33 +100,20 @@ In this QuickStart tutorial, you only need to execute one command for installati
 ./kk create cluster [--with-kubernetes version] [--with-kubesphere version]
 ```
 
-Here are some examples for your reference:
+Create a Kubernetes cluster with KubeSphere installed. Here is an example for your reference:
 
-- Create a Kubernetes cluster with the default version.
-
-```bash
-./kk create cluster
-```
-
-- Create a Kubernetes cluster with a specified version.
 
 ```bash
-./kk create cluster --with-kubernetes v1.18.6
-```
-
-- Create a Kubernetes cluster with KubeSphere installed (e.g. `--with-kubesphere v3.0.0`).
-
-```bash
-./kk create cluster --with-kubesphere [version]
+./kk create cluster --with-kubernetes v1.17.9 --with-kubesphere v3.0.0
 ```
 
 {{< notice note >}}
 
 - Supported Kubernetes versions: *v1.15.12*, *v1.16.13*, *v1.17.9* (default), *v1.18.6*.
 - For all-in-one installation, generally speaking, you do not need to change any configuration.
-- KubeKey will install [OpenEBS](https://openebs.io/) to provision LocalPV for development and testing environment by default, which is convenient for new users. For other storage classes, see Storage Class Configuration.
+- KubeKey will install [OpenEBS](https://openebs.io/) to provision LocalPV for development and testing environment by default, which is convenient for new users. For other storage classes, see [Persistent Storage Configuration](../../installing-on-linux/introduction/storage-configuration/).
 
-{{</ notice >}} 
+{{</ notice >}}
 
 After you execute the command, you will see a table as below for environment check.
 
@@ -145,11 +121,11 @@ After you execute the command, you will see a table as below for environment che
 
 Make sure the above components marked with `y` are installed and input `yes` to continue.
 
-{{< notice note >}} 
+{{< notice note >}}
 
 If you download the binary file directly in Step 2, you do not need to install `docker` as KubeKey will install it automatically.
 
-{{</ notice >}} 
+{{</ notice >}}
 
 ## Step 4: Verify the Installation
 
@@ -178,7 +154,7 @@ NOTES：
   1. After logging into the console, please check the
      monitoring status of service components in
      the "Cluster Management". If any service is not
-     ready, please wait patiently until all components 
+     ready, please wait patiently until all components
      are ready.
   2. Please modify the default password after login.
 
@@ -191,12 +167,12 @@ https://kubesphere.io             20xx-xx-xx xx:xx:xx
 
 You may need to bind EIP and configure port forwarding in your environment for external users to access the console. Besides, make sure the port 30880 is opened in your security groups.
 
-{{</ notice >}} 
+{{</ notice >}}
 
-After logging in the console, you can check the status of different components in **Components**. You may need to wait for some components to be up and running if you want to use related services.
+After logging in the console, you can check the status of different components in **Components**. You may need to wait for some components to be up and running if you want to use related services. You can also use `kubectl get pod --all-namespaces` to inspect the running status of KubeSphere workloads.
 
 ![components](https://ap3.qingstor.com/kubesphere-website/docs/components.png)
 
 ## Enable Pluggable Components (Optional)
 
-The guide above is used only for minimal installation by default. To enable other components in KubeSphere, see Enable Pluggable Components for more details.
+The guide above is used only for minimal installation by default. To enable other components in KubeSphere, see [Enable Pluggable Components](../../pluggable-components/) for more details.

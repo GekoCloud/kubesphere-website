@@ -3,8 +3,8 @@
     {{ if eq .Site.Language.Lang "zh"}}
     <div class="join-div">
         <div class="content">
-            👏 KubeSphere v3.0 即将正式 GA！<a href="https://www.qingcloud.com/kubesphere2020#tz2" target="_blank" rel="noopener noreferrer">免费回看 v3.0 发布会视频 📺</a>
-            <a href="https://kubesphere.com.cn/forum/d/1625-kubesphere-3-0" target="_blank" rel="noopener noreferrer">或参与社区帮助测试 v3.0 →</a>
+            🚀 KubeSphere v3.0.0 正式 GA！<a href="https://www.qingcloud.com/kubesphere2020#tz2" target="_blank" rel="noopener noreferrer">免费回看 v3.0 发布会视频 📺</a>
+            <a href="https://kubesphere.com.cn/forum/d/2062-awesome-kubesphere-kubesphere-3-0" target="_blank" rel="noopener noreferrer">了解一键快速安装入门的最佳方式📚 →</a>
             <img id="close-join" src="/images/header/close.svg" alt="close">
         </div>
     </div>
@@ -198,26 +198,6 @@ var bindClickClose = function() {
 }
 
 var language = '{{.Site.Language.Lang}}'
-
-var bindClickDocs = function() {
-    var host = window.location.origin
-    $('a').click(function(e) {
-    var name = $(this).data('docs')
-    if (name === 'Documentation') {
-      e.preventDefault()
-      if (host === 'https://kubesphere.com.cn/' || host === 'https://kubesphere.io/') {
-          if (language === 'zh') {
-            window.open('https://kubesphere.com.cn/docs/zh-CN/')
-          } else {
-            window.open('https://kubesphere.io/docs/')
-          }
-      } else {
-          window.open('/docs/')
-      }
-    }
-  })
-}
-bindClickDocs()
 
 bindClickClose()
 

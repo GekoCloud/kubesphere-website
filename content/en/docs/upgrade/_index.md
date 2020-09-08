@@ -11,12 +11,24 @@ icon: "/images/docs/docs.svg"
 
 ---
 
-## Installing KubeSphere and Kubernetes on Linux
+This chapter demonstrates how cluster operators can upgrade existing KubeSphere to v3.0.0.
 
-In this chapter, we will demonstrate how to use KubeKey to provision a new Kubernetes and KubeSphere cluster based on different infrastructures. Kubekey can help you to quickly build a production-ready cluster architecture on a set of machines from zero to one. It also helps you to easily scale the cluster and install pluggable components on existing architecture.
+## [Overview](../upgrade/upgrade-overview/)
 
-## Most Popular Pages
+Understand what you need to pay attention to before the upgrade, such as versions and upgrade tools.
 
-Below you will find some of the most common and helpful pages from this chapter. We highly recommend you to review them at first.
+## [Upgrade with KubeKey](../upgrade/upgrade-with-kubekey/)
 
-{{< popularPage icon="/images/docs/bitmap.jpg" title="Install KubeSphere on AWS EC2" description="Provisioning a new Kubernetes and KubeSphere cluster based on AWS" link="" >}}
+Follow steps to use KubeKey to upgrade Kubernetes and KubeSphere.
+
+## [Upgrade with ks-installer](../upgrade/upgrade-with-ks-installer/)
+
+Follow steps to use ks-installer to upgrade KubeSphere.
+
+## [Changes after Upgrade](../upgrade/what-changed/)
+
+Understand what will be changed after the upgrade.
+
+## [FAQ](../upgrade/upgrade-faq/)
+
+Find the answers to some of the most asked questions of upgrading.
