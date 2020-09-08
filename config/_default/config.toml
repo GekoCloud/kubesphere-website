@@ -10,6 +10,12 @@ baseURL = "https://kubesphere.es"
 [params]
 logo = "images/logo.svg"
 
+githubUrl = "https://github.com/kubesphere/website"
+
+githubBlobUrl = "https://github.com/kubesphere/website/blob/master/content"
+
+githubEditUrl = "https://github.com/kubesphere/website/edit/master/content"
+
 mailchimpSubscribeUrl = "https://kubesphere.us10.list-manage.com/subscribe/post?u=c85ea2b944b08b951f607bdd4&id=83f673a2d9"
 
 gcs_engine_id = "018068616810858123755%3Apb1pt8sx6ve"
@@ -90,7 +96,31 @@ hasChildren = true
 [[languages.en.menu.main]]
 weight = 4
 name = "Documentation"
-URL = "https://kubesphere.io/docs/"
+hasChildren = true
+
+    [[languages.en.menu.main]]
+    parent = "Documentation"
+    name = "v3.0.0"
+    URL = "docs/"
+    weight = 1
+
+    [[languages.en.menu.main]]
+    parent = "Documentation"
+    name = "v2.1.x"
+    URL = "https://v2-1.docs.kubesphere.io/docs"
+    weight = 2
+
+    [[languages.en.menu.main]]
+    parent = "Documentation"
+    name = "v2.0.x"
+    URL = "https://v2-0.docs.kubesphere.io/docs/"
+    weight = 3
+
+    [[languages.en.menu.main]]
+    parent = "Documentation"
+    name = "v1.0.0"
+    URL = "https://v1-0.docs.kubesphere.io/docs/"
+    weight = 4
 
 [[languages.en.menu.main]]
 weight = 5
@@ -192,8 +222,31 @@ hasChildren = true
 
 [[languages.zh.menu.main]]
 weight = 4
+hasChildren = true
 name = "文档中心"
-URL = "https://kubesphere.com.cn/docs/zh-CN/"
+    [[languages.zh.menu.main]]
+    parent = "文档中心"
+    name = "v3.0.0"
+    URL = "docs/"
+    weight = 1
+
+    [[languages.zh.menu.main]]
+    parent = "文档中心"
+    name = "v2.1.x"
+    URL = "https://v2-1.docs.kubesphere.io/docs/zh-CN/"
+    weight = 2
+
+    [[languages.zh.menu.main]]
+    parent = "文档中心"
+    name = "v2.0.x"
+    URL = "https://v2-0.docs.kubesphere.io/docs/zh-CN/"
+    weight = 3
+
+    [[languages.zh.menu.main]]
+    parent = "文档中心"
+    name = "v1.0.0"
+    URL = "https://v1-0.docs.kubesphere.io/docs/zh-CN/"
+    weight = 4
 
 [[languages.zh.menu.main]]
 weight = 5

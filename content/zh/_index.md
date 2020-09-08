@@ -10,9 +10,9 @@ section1:
   topic: 面向云原生应用的<br>容器混合云
   content: KubeSphere 愿景是打造一个以 Kubernetes 为内核的云原生分布式操作系统，它的架构可以非常方便地使第三方应用与云原生生态组件进行即插即用（plug-and-play）的集成，支持云原生应用在多云与多集群的统一分发和运维管理。
   btnContent1: 在 Kubernetes 安装
-  downloadLink1: "https://kubesphere.com.cn/docs/zh-CN/installation/install-on-k8s/"
+  downloadLink1: "https://kubesphere.com.cn/docs/quick-start/minimal-kubesphere-on-k8s/"
   btnContent2: 在 Linux 安装
-  downloadLink2: "https://kubesphere.com.cn/docs/zh-CN/installation/all-in-one/"
+  downloadLink2: "https://kubesphere.com.cn/docs/quick-start/all-in-one-on-linux/"
 
 section2:
   title: 全栈的平台级解决方案
@@ -96,7 +96,7 @@ section4:
     - name: 应用商店
       icon: /images/home/store.svg
       content: 提供基于 Helm 的应用商店与应用仓库，内置多个应用模板，支持应用生命周期管理
-      link: "https://kubesphere.io/docs/zh-CN/installation/install-openpitrix/"
+      link: "/zh/docs/pluggable-components/app-store/"
       color: grape
 
     - name: 基于 Istio 的微服务治理
@@ -120,20 +120,19 @@ section4:
     - name: 支持多种存储方案
       icon: /images/home/multiple.svg
       content: 支持 GlusterFS、Ceph RBD、NFS、LocalPV，提供多个 CSI 插件对接使用云上的企业级存储产品
-      link: "https://kubesphere.io/docs/zh-CN/introduction/features/#multiple-storage-solutions-support"
+      link: "/zh/docs/introduction/features/#multiple-storage-solutions"
       color: grape
 
     - name: 网络管理
       icon: /images/home/network.svg
       content: 提供面向物理机 Kubernetes 环境的负载均衡器 <a class='inner-a' target='_blank' href='https://porterlb.io'>Porter</a>，支持网络策略的可视化管理，支持 Calico 与 Flannel CNI
-      link: "https://kubesphere.io/docs/zh-CN/introduction/features/#multiple-network-solutions-support"
+      link: "/zh/docs/introduction/features/#multiple-network-solutions"
       color: green
 
     - name: 多集群管理
       icon: /images/home/management.svg
       content: 跨多云与多集群统一分发应用，提供集群高可用与灾备的最佳实践，支持跨级群的可观察性
-      check: true
-      link: ""
+      link: "/zh/docs/multicluster-management/introduction/overview/"
       color: orange
 
 section5:

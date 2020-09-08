@@ -1,0 +1,66 @@
+---
+title: "Installing on Kubernetes"
+description: "Demonstrate how to install KubeSphere on Kubernetes either hosted on cloud or on-premises."
+layout: "single"
+
+linkTitle: "Installing on Kubernetes"
+weight: 2500
+
+icon: "/images/docs/docs.svg"
+---
+
+This chapter demonstrates how to deploy KubeSphere on existing Kubernetes clusters hosted on cloud or on-premises. As a highly flexible solution to container orchestration, KubeSphere allows users to deploy it and use its services across all Kubernetes engines.
+
+## Introduction
+
+### [Overview](../installing-on-kubernetes/introduction/overview/)
+
+Develop a basic understanding of the general steps of deploying KubeSphere on existing Kubernetes clusters.
+
+### [Prerequisites](../installing-on-kubernetes/introduction/prerequisites/)
+
+Make sure your environment where existing Kubernetes clusters run meets the prerequisites before installation.
+
+## Installing on Hosted Kubernetes
+
+### [Deploy KubeSphere on Oracle OKE](../installing-on-kubernetes/hosted-kubernetes/install-kubesphere-on-oke/)
+
+Learn how to deploy KubeSphere on Oracle Cloud Infrastructure Container Engine for Kubernetes.
+
+### [Deploy KubeSphere on AWS EKS](../installing-on-kubernetes/hosted-kubernetes/install-kubesphere-on-eks/)
+
+Learn how to deploy KubeSphere on Amazon Elastic Kubernetes Service.
+
+### [Deploy KubeSphere on DigitalOcean](../installing-on-kubernetes/hosted-kubernetes/install-kubesphere-on-do/)
+
+Learn how to deploy KubeSphere on DigitalOcean.
+
+### [Deploy KubeSphere on GKE](../installing-on-kubernetes/hosted-kubernetes/install-kubesphere-on-gke/)
+
+Learn how to deploy KubeSphere on Google Kubernetes Engine.
+
+### [Deploy KubeSphere on AKS](../installing-on-kubernetes/hosted-kubernetes/install-kubesphere-on-aks/)
+
+Learn how to deploy KubeSphere on Azure Kubernetes Service.
+
+### [Deploy KubeSphere on Huawei CCE](../installing-on-kubernetes/hosted-kubernetes/install-ks-on-huawei-cce/)
+
+Learn how to deploy KubeSphere on Huawei Cloud Container Engine.
+
+## Installing on On-premises Kubernetes
+
+### [Air-gapped Installation](../installing-on-kubernetes/on-prem-kubernetes/install-ks-on-linux-airgapped/)
+
+Explore the best practice of installing KubeSphere in an air-gapped environment.
+
+## Uninstalling
+
+### [Uninstalling KubeSphere from Kubernetes](../installing-on-kubernetes/uninstalling/uninstalling-kubesphere-from-k8s/)
+
+Remove KubeSphere from Kubernetes clusters.
+
+## Most Popular Pages
+
+Below you will find some of the most viewed and helpful pages in this chapter. It is highly recommended that you refer to them first.
+
+{{< popularPage icon="/images/docs/bitmap.jpg" title="Deploy KubeSphere on AWS EKS" description="Provision KubeSphere on existing Kubernetes clusters on EKS." link="../installing-on-kubernetes/hosted-kubernetes/install-kubesphere-on-eks/" >}}
