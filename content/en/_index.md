@@ -10,9 +10,9 @@ section1:
   topic: The Kubernetes platform tailored for hybrid multicloud
   content: KubeSphere is a distributed operating system managing cloud native applications with Kubernetes as its kernel, and provides plug-and-play architecture for the seamless integration of third-party applications to boost its ecosystem.
   btnContent1: Install on Kubernetes
-  downloadLink1: "https://kubesphere.io/docs/installation/install-on-k8s/"
+  downloadLink1: "https://kubesphere.io/docs/quick-start/minimal-kubesphere-on-k8s/"
   btnContent2: Install on Linux
-  downloadLink2: "https://kubesphere.io/docs/installation/all-in-one/"
+  downloadLink2: "https://kubesphere.io/docs/quick-start/all-in-one-on-linux/"
 
 section2:
   title: One Platform for Full Stack Solutions
@@ -96,7 +96,7 @@ section4:
     - name: Application Store
       icon: /images/home/store.svg
       content: Provide an application store for Helm-based applications, and offer application lifecycle management
-      link: "https://kubesphere.io/docs/installation/install-openpitrix/"
+      link: "/docs/pluggable-components/app-store/"
       color: grape
 
     - name: Service Mesh (Istio-based)
@@ -120,20 +120,19 @@ section4:
     - name: Multiple Storage Solutions
       icon: /images/home/multiple.svg
       content: Support GlusterFS, CephRBD, NFS, LocalPV solutions, and provide CSI plugins to consume storage from multiple cloud providers
-      link: "https://kubesphere.io/docs/introduction/features/#multiple-storage-solutions-support"
+      link: "/docs/introduction/features/#multiple-storage-solutions"
       color: grape
 
     - name: Multiple Network Solutions
       icon: /images/home/network.svg
       content: Provide a <a class='inner-a' target='_blank' href='https://porterlb.io'>load balancer Porter</a> for bare metal Kubernetes, and offers network policy management, support Calico and Flannel CNI
-      link: "https://kubesphere.io/docs/introduction/features/#multiple-network-solutions-support"
+      link: "/docs/introduction/features/#multiple-network-solutions"
       color: green
 
     - name: Multi-cluster Management
       icon: /images/home/management.svg
       content: Distribute applications across multiple clusters and cloud providers, and provide disaster recovery solutions and cross-cluster observability
-      check: true
-      link: ""
+      link: "/docs/multicluster-management/introduction/overview/"
       color: orange
 
 section5:
